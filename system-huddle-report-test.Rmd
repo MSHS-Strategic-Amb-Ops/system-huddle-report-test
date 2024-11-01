@@ -996,7 +996,7 @@ vol_trending <- scheduling_data %>%
   # filter(TO_DATE(date_end_formatted, "YYYY-MM-DD HH24:MI:SS") <= APPT_DTTM) %>%
   group_by(Campus, Appt.Year, Appt.MonNum) %>%
   summarise(total = n()) %>%
-  # collect() %>%
+  collect() %>%
   mutate(Appt.Month = format(as.Date(paste0(Appt.MonNum, "-01-", Appt.Year), "%m-%d-%Y"), "%b")) %>%
   mutate(Appt.Year = as.character(Appt.Year))
 
@@ -1073,7 +1073,7 @@ vol_trending_downtown <- scheduling_data %>%
   # filter(TO_DATE(date_end_formatted, "YYYY-MM-DD HH24:MI:SS") <= APPT_DTTM) %>%
   group_by(Campus, Appt.Year, Appt.MonNum) %>%
   summarise(total = n()) %>%
-  # collect() %>%
+  collect() %>%
   mutate(Appt.Month = format(as.Date(paste0(Appt.MonNum, "-01-", Appt.Year), "%m-%d-%Y"), "%b")) %>%
   mutate(Appt.Year = as.character(Appt.Year))
 
@@ -1157,7 +1157,7 @@ new_vol <- scheduling_data %>%
   filter(TO_DATE(date_start_formatted, "YYYY-MM-DD HH24:MI:SS") <= APPT_DTTM) %>%
   group_by(Campus, Appt.Year, Appt.MonNum, LOS_NAME) %>%
   summarise(total = n()) %>%
-  # collect() %>%
+  collect() %>%
   mutate(New.PT3 = ifelse(str_detect(LOS_NAME, "NEW|INITIAL"), "New", "Established"))
 
 
@@ -1430,8 +1430,8 @@ missing_ytd_data <-scheduling_data %>%
   filter(DERIVED_STATUS_DESC == "Arrived") %>%
   filter(VISIT_PROV_STAFF_RESOURCE_C == 1) %>%
   filter(TO_DATE(missing_chg_cutOff,"YYYY-MM-DD HH24:MI:SS") >= APPT_DTTM) %>%
-  mutate(clo.5days = ifelse(open.days <= 5, 'YES', 'NO')) 
-  # collect()
+  mutate(clo.5days = ifelse(open.days <= 5, 'YES', 'NO')) %>%
+  collect()
 
 missing_ytd_data <- missing_ytd_data %>% 
   filter(DEPARTMENT_NAME %!in% exc_depts) %>%
