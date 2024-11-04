@@ -1440,18 +1440,19 @@ invisible(gc())
 #   mutate(clo.5days = ifelse(open.days <= 5, 'YES', 'NO')) %>%
 #   collect()
 
+
+# missing_ytd_data <- missing_ytd_data %>% 
+#   filter(DEPARTMENT_NAME %!in% exc_depts) %>%
+#   filter(Provider %!in% exc_providers) %>%
+#   filter(PRC_NAME %!in% exc_prc_name) %>%
+#   filter(PRC_ID %!in% exc_prc_id) %>%
+#   filter(!str_detect(PRC_NAME, "ECHO|SOCIAL|NURSE|NUTRITION|LAB|TREATMENT")) %>%
+#   mutate(Appt.Month = format(as.Date(paste0(Appt.MonNum, "-01-", Appt.Year), "%m-%d-%Y"), "%b")) %>%
+#   mutate(Appt.Year = as.character(Appt.Year)) %>%
+#   mutate(Appt.MonthYear = paste0(Appt.Month,"-",Appt.Year))
+
 missing_ytd_data <- missing_chg_data  %>%
   filter(Appt.Year == todays_year) 
-  
-missing_ytd_data <- missing_ytd_data %>% 
-  filter(DEPARTMENT_NAME %!in% exc_depts) %>%
-  filter(Provider %!in% exc_providers) %>%
-  filter(PRC_NAME %!in% exc_prc_name) %>%
-  filter(PRC_ID %!in% exc_prc_id) %>%
-  filter(!str_detect(PRC_NAME, "ECHO|SOCIAL|NURSE|NUTRITION|LAB|TREATMENT")) %>%
-  mutate(Appt.Month = format(as.Date(paste0(Appt.MonNum, "-01-", Appt.Year), "%m-%d-%Y"), "%b")) %>%
-  mutate(Appt.Year = as.character(Appt.Year)) %>%
-  mutate(Appt.MonthYear = paste0(Appt.Month,"-",Appt.Year))
 
 # missing_ytd_data <- as.data.frame(readRDS("/nfs/data/Applications/Ambulatory/Data_Updated/missing_ytd_data.rds")) %>%
 #   filter(Appt.Year == todays_year) 
