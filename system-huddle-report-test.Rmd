@@ -1427,18 +1427,22 @@ invisible(gc())
 ## MSHS
 ### 1. MSHS Open Encounters
 ```{r MSHS Unlocked Notes Metrics, echo = FALSE, warning = FALSE, message = FALSE}
-missing_ytd_data <-scheduling_data %>%
-  filter(Appt.Year == todays_year) %>%
-  filter(DERIVED_STATUS_DESC == "Arrived") 
-  
-missing_ytd_data <-missing_ytd_data %>%
-  filter(VISIT_PROV_STAFF_RESOURCE_C == 1) %>%
-  filter(TO_DATE(missing_chg_cutOff,"YYYY-MM-DD HH24:MI:SS") >= APPT_DTTM) 
-  
-missing_ytd_data <-missing_ytd_data %>%
-  mutate(clo.5days = ifelse(open.days <= 5, 'YES', 'NO')) %>%
-  collect()
 
+# missing_ytd_data <-scheduling_data %>%
+#   filter(Appt.Year == todays_year) %>%
+#   filter(DERIVED_STATUS_DESC == "Arrived") 
+#   
+# missing_ytd_data <-missing_ytd_data %>%
+#   filter(VISIT_PROV_STAFF_RESOURCE_C == 1) %>%
+#   filter(TO_DATE(missing_chg_cutOff,"YYYY-MM-DD HH24:MI:SS") >= APPT_DTTM) 
+#   
+# missing_ytd_data <-missing_ytd_data %>%
+#   mutate(clo.5days = ifelse(open.days <= 5, 'YES', 'NO')) %>%
+#   collect()
+
+missing_ytd_data <- missing_chg_data  %>%
+  filter(Appt.Year == todays_year) 
+  
 missing_ytd_data <- missing_ytd_data %>% 
   filter(DEPARTMENT_NAME %!in% exc_depts) %>%
   filter(Provider %!in% exc_providers) %>%
