@@ -433,131 +433,131 @@ print(hh_data_comp_raw)
 <!-- ``` -->
 
 
-<!-- ```{r Hand Hygiene Data Processing, echo = FALSE, warning = FALSE, message = FALSE} -->
+```{r Hand Hygiene Data Processing, echo = FALSE, warning = FALSE, message = FALSE}
 
-<!-- # Processs RedCap Data -------------------------- -->
-<!-- ## Format Column Names -------------------- -->
-<!-- colnames(hh_data_comp_raw) <- tolower(colnames(hh_data_comp_raw)) -->
-
-
-<!-- # Manuallyt Map Site Information --------- -->
-<!-- ## Map MSD units -->
-<!-- hh_data_comp_raw$site<- ifelse(hh_data_comp_raw$site == "MSD", -->
-<!--                                 hh_crosswalk$unit[match(trim(hh_data_comp_raw$msd_unit), trim(hh_crosswalk$Location))], hh_data_comp_raw$site) -->
-<!-- ## Map msh_unit -->
-<!-- hh_data_comp_raw$site<- ifelse(hh_data_comp_raw$site == "MSH", -->
-<!--                                 hh_crosswalk$unit[match(trim(hh_data_comp_raw$msh_unit), trim(hh_crosswalk$Location))], hh_data_comp_raw$site) -->
-
-<!-- hh_data_comp <- hh_data_comp_raw %>% -->
-<!--   dplyr::select(-language) %>% -->
-<!--   pivot_longer( -->
-<!--     c("msb_unit","msh_unit","msd_unit","nyee_unit","msq_unit","msm_unit","msw_unit","net_unit"), -->
-<!--     names_to = "unit_site", -->
-<!--     values_to = "unit" -->
-<!--   ) %>% -->
-<!--   filter(date != "NULL") %>% -->
-<!--   filter(date != "") %>% -->
-<!--   mutate_if(is.numeric, as.character) %>% -->
-<!--   filter(!is.na(site)) -->
+# Processs RedCap Data --------------------------
+## Format Column Names --------------------
+colnames(hh_data_comp_raw) <- tolower(colnames(hh_data_comp_raw))
 
 
-<!-- # Process Patient Entry Data -------------------- -->
-<!-- colnames(hh_data_comp_raw_pt_entry) <- tolower(colnames(hh_data_comp_raw_pt_entry)) -->
-<!-- hh_data_comp_pt_entry <- hh_data_comp_raw_pt_entry %>% -->
-<!--   rename(date = data_date) %>% -->
-<!--   mutate(site = ifelse(site == "MSH", "MSDFP", site)) %>% -->
-<!--   mutate_if(is.numeric, as.character)  -->
+# Manuallyt Map Site Information ---------
+## Map MSD units
+hh_data_comp_raw$site<- ifelse(hh_data_comp_raw$site == "MSD",
+                                hh_crosswalk$unit[match(trim(hh_data_comp_raw$msd_unit), trim(hh_crosswalk$Location))], hh_data_comp_raw$site)
+## Map msh_unit
+hh_data_comp_raw$site<- ifelse(hh_data_comp_raw$site == "MSH",
+                                hh_crosswalk$unit[match(trim(hh_data_comp_raw$msh_unit), trim(hh_crosswalk$Location))], hh_data_comp_raw$site)
 
-<!-- hh_data_comp_pt_entry$date <- as.character(hh_data_comp_pt_entry$date) -->
-<!-- hh_data_comp <- bind_rows(hh_data_comp, hh_data_comp_pt_entry) -->
-
-
-
-<!-- # Merge RedCap and Patient Entry Data ----------- -->
-<!-- hh_data_merged <- hh_data_comp %>% -->
-<!--   filter(!site %in% c("MS NOW", "MSHP", "NYEE", "MSQ","OTHER","MSB")) %>% -->
-<!--   filter(!is.na(site)) %>% -->
-<!--   dplyr::select(site, unit, date, worker___1, worker___2, worker___3, provider_hands_bef, provider_hands_aft, nurse_hands_bef, nurse_hands_aft, mt_hands_bef, mt_hands_aft) %>% -->
-<!--   mutate(across(4:12, as.numeric)) %>% -->
-<!--   mutate_if(is.numeric, ~ifelse(is.na(.),0,.)) %>% -->
-<!--   mutate_if(is.numeric, ~ifelse(.==2,0,.)) %>% -->
-<!--   group_by(site, unit, date) %>% -->
-<!--   summarise(worker___1 = sum(worker___1), -->
-<!--             worker___2 = sum(worker___2), -->
-<!--             worker___3 = sum(worker___3), -->
-<!--             provider_hands_bef = sum(provider_hands_bef), -->
-<!--             provider_hands_aft = sum(provider_hands_aft), -->
-<!--             nurse_hands_bef = sum(nurse_hands_bef), -->
-<!--             nurse_hands_aft = sum(nurse_hands_aft), -->
-<!--             mt_hands_bef = sum(mt_hands_bef), -->
-<!--             mt_hands_aft = sum(mt_hands_aft)) %>% -->
-<!--   mutate(date = as.Date(date, "%m/%d/%Y"), -->
-<!--          Appt.Year = as.numeric(format(as.Date(date, "%m/%d/%Y"),"%Y")), -->
-<!--          Appt.WeekNum = lubridate::epiweek(as.Date(date, "%m/%d/%Y"))) %>% -->
-<!--   filter(Appt.Year >= as.numeric(prior_year)) -->
-
-<!-- hh_data_merged_role <- hh_data_comp %>% -->
-<!--   dplyr::select(site, unit, date, provider_hands_bef, provider_hands_aft, nurse_hands_bef, nurse_hands_aft, mt_hands_bef, mt_hands_aft) %>% -->
-<!--   pivot_longer(provider_hands_bef: mt_hands_aft, -->
-<!--                names_to = "role", -->
-<!--                values_to = "compliance") %>% -->
-<!--   mutate(date = as.Date(date, "%m/%d/%Y"), -->
-<!--          Appt.Year = as.numeric(format(as.Date(date, "%m/%d/%Y"),"%Y")), -->
-<!--          Appt.WeekNum = lubridate::epiweek(as.Date(date, "%m/%d/%Y")), -->
-<!--          compliance = ifelse(compliance == 2,0,compliance)) %>% -->
-<!--   filter(compliance != "") %>% -->
-<!--   filter(compliance != 2) %>% -->
-<!--   filter(Appt.Year >= as.numeric(prior_year)) %>% -->
-<!--   group_by(site, unit, date, Appt.Year, Appt.WeekNum, role, compliance) %>% -->
-<!--   summarise(total_obs = n())%>% -->
-<!--   mutate(compliance = ifelse(compliance == 0, "No", "Yes"), -->
-<!--          total_obs = as.numeric(total_obs)) %>% -->
-<!--   pivot_wider( -->
-<!--     names_from = compliance, -->
-<!--     values_from = total_obs, -->
-<!--     values_fill=list(total_obs=0)) %>% -->
-<!--   ungroup() %>% -->
-<!--   mutate(total_obs = `Yes`+`No`) -->
+hh_data_comp <- hh_data_comp_raw %>%
+  dplyr::select(-language) %>%
+  pivot_longer(
+    c("msb_unit","msh_unit","msd_unit","nyee_unit","msq_unit","msm_unit","msw_unit","net_unit"),
+    names_to = "unit_site",
+    values_to = "unit"
+  ) %>%
+  filter(date != "NULL") %>%
+  filter(date != "") %>%
+  mutate_if(is.numeric, as.character) %>%
+  filter(!is.na(site))
 
 
-<!-- # Manually Format NET to NETWORK ------------------------ -->
-<!-- hh_data_merged <- hh_data_merged %>% -->
-<!--   mutate(site = ifelse(site == "NET","NETWORK",site)) %>% -->
-<!--   arrange(date) %>% -->
-<!--   filter(unit != "NULL") -->
-<!-- hh_data_merged_role <- hh_data_merged_role %>% -->
-<!--   mutate(site = ifelse(site == "NET","NETWORK",site)) %>% -->
-<!--   arrange(date) %>% -->
-<!--   filter(unit != "NULL") -->
-<!-- hh_data_merged <- hh_data_merged %>% -->
-<!--   mutate(site = ifelse(unit == "UCC", "MSUS",site)) -->
+# Process Patient Entry Data --------------------
+colnames(hh_data_comp_raw_pt_entry) <- tolower(colnames(hh_data_comp_raw_pt_entry))
+hh_data_comp_pt_entry <- hh_data_comp_raw_pt_entry %>%
+  rename(date = data_date) %>%
+  mutate(site = ifelse(site == "MSH", "MSDFP", site)) %>%
+  mutate_if(is.numeric, as.character)
 
-<!-- ``` -->
+hh_data_comp_pt_entry$date <- as.character(hh_data_comp_pt_entry$date)
+hh_data_comp <- bind_rows(hh_data_comp, hh_data_comp_pt_entry)
 
 
-<!-- ```{r Scheduling Data Filtering, echo = FALSE, warning = FALSE, message = FALSE} -->
 
-<!-- scheduling_data <- access_raw_tbl %>% -->
-<!--   dplyr::select(PAT_ENC_CSN_ID, CONTACT_DATE, APPT_STATUS_NAME, -->
-<!--                 DEPARTMENT_ID, DEPARTMENT_NAME, DEPT_SPECIALTY_NAME,         -->
-<!--                 PROV_ID, PROV_NAME_WID, PRC_NAME, PRC_ID, APPT_MADE_DTTM,                 -->
-<!--                 APPT_MADE_DATE, APPT_BLOCK_NAME, APPT_DTTM,                -->
-<!--                 APPT_CANC_DTTM, APPT_CANC_DATE,                -->
-<!--                 EM_CODE_YN, PAT_NAME,                      -->
-<!--                 MRN, VISIT_GROUP_NUM,              -->
-<!--                 FINCLASS, VISITPAYOR, VISITPLAN,                      -->
-<!--                 VISIT_PROV_STAFF_RESOURCE_C,                     -->
-<!--                 VISIT_TYPE,            -->
-<!--                 NPI,            -->
-<!--                 CAMPUS,                -->
-<!--                 Y_COSIGN_MSG, Y_CHART_COSIGN_ID, COSIGN_NAME, Y_ENC_COSIGN_TIME, Y_ENC_CLOSE_TIME,               -->
-<!--                 Y_ENC_OPEN_TIME,                          -->
-<!--                 COS_PROV_ID, COS_PROV_NAME,       -->
-<!--                 ENC_CLOSED_CHARGE_STATUS, PRIMARY_DX_CODE, PRIMARY_DX_NAME, LOS_CODE, -->
-<!--                 LOS_NAME, DERIVED_STATUS_DESC, DEP_RPT_GRP_ELEVEN, DEP_RPT_GRP_SEVENTEEN,           -->
-<!--                 SITE, VISIT_METHOD, VIS_NEW_TO_DEP_YN, VIS_NEW_TO_PROV_YN, SCHED_METHOD)  -->
+# Merge RedCap and Patient Entry Data -----------
+hh_data_merged <- hh_data_comp %>%
+  filter(!site %in% c("MS NOW", "MSHP", "NYEE", "MSQ","OTHER","MSB")) %>%
+  filter(!is.na(site)) %>%
+  dplyr::select(site, unit, date, worker___1, worker___2, worker___3, provider_hands_bef, provider_hands_aft, nurse_hands_bef, nurse_hands_aft, mt_hands_bef, mt_hands_aft) %>%
+  mutate(across(4:12, as.numeric)) %>%
+  mutate_if(is.numeric, ~ifelse(is.na(.),0,.)) %>%
+  mutate_if(is.numeric, ~ifelse(.==2,0,.)) %>%
+  group_by(site, unit, date) %>%
+  summarise(worker___1 = sum(worker___1),
+            worker___2 = sum(worker___2),
+            worker___3 = sum(worker___3),
+            provider_hands_bef = sum(provider_hands_bef),
+            provider_hands_aft = sum(provider_hands_aft),
+            nurse_hands_bef = sum(nurse_hands_bef),
+            nurse_hands_aft = sum(nurse_hands_aft),
+            mt_hands_bef = sum(mt_hands_bef),
+            mt_hands_aft = sum(mt_hands_aft)) %>%
+  mutate(date = as.Date(date, "%m/%d/%Y"),
+         Appt.Year = as.numeric(format(as.Date(date, "%m/%d/%Y"),"%Y")),
+         Appt.WeekNum = lubridate::epiweek(as.Date(date, "%m/%d/%Y"))) %>%
+  filter(Appt.Year >= as.numeric(prior_year))
 
-<!-- ``` -->
+hh_data_merged_role <- hh_data_comp %>%
+  dplyr::select(site, unit, date, provider_hands_bef, provider_hands_aft, nurse_hands_bef, nurse_hands_aft, mt_hands_bef, mt_hands_aft) %>%
+  pivot_longer(provider_hands_bef: mt_hands_aft,
+               names_to = "role",
+               values_to = "compliance") %>%
+  mutate(date = as.Date(date, "%m/%d/%Y"),
+         Appt.Year = as.numeric(format(as.Date(date, "%m/%d/%Y"),"%Y")),
+         Appt.WeekNum = lubridate::epiweek(as.Date(date, "%m/%d/%Y")),
+         compliance = ifelse(compliance == 2,0,compliance)) %>%
+  filter(compliance != "") %>%
+  filter(compliance != 2) %>%
+  filter(Appt.Year >= as.numeric(prior_year)) %>%
+  group_by(site, unit, date, Appt.Year, Appt.WeekNum, role, compliance) %>%
+  summarise(total_obs = n())%>%
+  mutate(compliance = ifelse(compliance == 0, "No", "Yes"),
+         total_obs = as.numeric(total_obs)) %>%
+  pivot_wider(
+    names_from = compliance,
+    values_from = total_obs,
+    values_fill=list(total_obs=0)) %>%
+  ungroup() %>%
+  mutate(total_obs = `Yes`+`No`)
+
+
+# Manually Format NET to NETWORK ------------------------
+hh_data_merged <- hh_data_merged %>%
+  mutate(site = ifelse(site == "NET","NETWORK",site)) %>%
+  arrange(date) %>%
+  filter(unit != "NULL")
+hh_data_merged_role <- hh_data_merged_role %>%
+  mutate(site = ifelse(site == "NET","NETWORK",site)) %>%
+  arrange(date) %>%
+  filter(unit != "NULL")
+hh_data_merged <- hh_data_merged %>%
+  mutate(site = ifelse(unit == "UCC", "MSUS",site))
+
+```
+
+
+```{r Scheduling Data Filtering, echo = FALSE, warning = FALSE, message = FALSE}
+
+scheduling_data <- access_raw_tbl %>%
+  dplyr::select(PAT_ENC_CSN_ID, CONTACT_DATE, APPT_STATUS_NAME,
+                DEPARTMENT_ID, DEPARTMENT_NAME, DEPT_SPECIALTY_NAME,
+                PROV_ID, PROV_NAME_WID, PRC_NAME, PRC_ID, APPT_MADE_DTTM,
+                APPT_MADE_DATE, APPT_BLOCK_NAME, APPT_DTTM,
+                APPT_CANC_DTTM, APPT_CANC_DATE,
+                EM_CODE_YN, PAT_NAME,
+                MRN, VISIT_GROUP_NUM,
+                FINCLASS, VISITPAYOR, VISITPLAN,
+                VISIT_PROV_STAFF_RESOURCE_C,
+                VISIT_TYPE,
+                NPI,
+                CAMPUS,
+                Y_COSIGN_MSG, Y_CHART_COSIGN_ID, COSIGN_NAME, Y_ENC_COSIGN_TIME, Y_ENC_CLOSE_TIME,
+                Y_ENC_OPEN_TIME,
+                COS_PROV_ID, COS_PROV_NAME,
+                ENC_CLOSED_CHARGE_STATUS, PRIMARY_DX_CODE, PRIMARY_DX_NAME, LOS_CODE,
+                LOS_NAME, DERIVED_STATUS_DESC, DEP_RPT_GRP_ELEVEN, DEP_RPT_GRP_SEVENTEEN,
+                SITE, VISIT_METHOD, VIS_NEW_TO_DEP_YN, VIS_NEW_TO_PROV_YN, SCHED_METHOD)
+
+```
 
 
 <!-- ```{r Scheduling Data Processing, echo = FALSE, warning = FALSE, message = FALSE} -->
