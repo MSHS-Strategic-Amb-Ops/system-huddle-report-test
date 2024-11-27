@@ -330,8 +330,8 @@ missing_chg_cutOff <- business_days[length(business_days)-3] # Should this be 2 
 # hh_data_comp_raw <- sqlQuery(con_hh, "SELECT * FROM qidm_dev.dbo.amb_hand_hygiene_comp") # Master Referrals Data
 # hh_data_comp_raw_pt_entry <- sqlQuery(con_hh, "SELECT * FROM qidm_dev.dbo.PT_AMB_HAND_HYGIENE_COMP") # Master Referrals Data
 
-hh_data_comp_raw <- read.csv("hand_hygiene_comp.csv")
-hh_data_comp_raw_pt_entry <- read.csv("pt_hand_hygiene_comp.csv")
+hh_data_comp_raw <<- read.csv("hand_hygiene_comp.csv")
+hh_data_comp_raw_pt_entry <<- read.csv("pt_hand_hygiene_comp.csv")
 
 # Run on Server ---------------------------
 # con_hh <- dbConnect(odbc(),
@@ -343,18 +343,18 @@ hh_data_comp_raw_pt_entry <- read.csv("pt_hand_hygiene_comp.csv")
 #                     Port = 1433)
 # hh_data_comp_raw_old <- dbGetQuery(con_hh, "SELECT * FROM qidm_dev.dbo.amb_hand_hygiene_comp") # old table
 # hh_data_comp_raw <- dbGetQuery(con_hh, "SELECT * FROM  qidm_prod.dbo.amb_hand_hygiene_comp")
-hh_data_comp_raw <- as.data.frame(hh_data_comp_raw)
-hh_data_comp_raw <- hh_data_comp_raw %>% distinct()
+hh_data_comp_raw <<- as.data.frame(hh_data_comp_raw)
+hh_data_comp_raw <<- hh_data_comp_raw %>% distinct()
 
 
 # hh_data_comp_raw_pt_entry_old <- dbGetQuery(con_hh, "SELECT * FROM qidm_prod.dbo.PT_AMB_HAND_HYGIENE_COMP")
-hh_data_comp_raw_pt_entry <- as.data.frame(hh_data_comp_raw_pt_entry)
-hh_data_comp_raw_pt_entry <- hh_data_comp_raw_pt_entry %>% distinct()
+hh_data_comp_raw_pt_entry <<- as.data.frame(hh_data_comp_raw_pt_entry)
+hh_data_comp_raw_pt_entry <<- hh_data_comp_raw_pt_entry %>% distinct()
 
 
 # Import HH Data Mapping ------------------
 # hh_crosswalk <- as.data.frame(read_csv("/nfs/data/Applications/Ambulatory/hh_crosswalk.csv"))
-hh_crosswalk <- hh_crosswalk_tbl %>% collect()
+hh_crosswalk <<- hh_crosswalk_tbl %>% collect()
 
 print(hh_data_comp_raw)
  
