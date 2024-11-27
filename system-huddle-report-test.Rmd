@@ -462,17 +462,17 @@ hh_data_comp <- hh_data_comp_raw %>%
 
 print(hh_data_comp)
 
-# Process Patient Entry Data --------------------
-colnames(hh_data_comp_raw_pt_entry) <- tolower(colnames(hh_data_comp_raw_pt_entry))
-hh_data_comp_pt_entry <- hh_data_comp_raw_pt_entry %>%
-  rename(date = data_date) %>%
-  mutate(site = ifelse(site == "MSH", "MSDFP", site)) %>%
-  mutate_if(is.numeric, as.character)
-
-hh_data_comp_pt_entry$date <- as.character(hh_data_comp_pt_entry$date)
-hh_data_comp <- bind_rows(hh_data_comp, hh_data_comp_pt_entry)
-
-print(hh_data_comp)
+# # Process Patient Entry Data --------------------
+# colnames(hh_data_comp_raw_pt_entry) <- tolower(colnames(hh_data_comp_raw_pt_entry))
+# hh_data_comp_pt_entry <- hh_data_comp_raw_pt_entry %>%
+#   rename(date = data_date) %>%
+#   mutate(site = ifelse(site == "MSH", "MSDFP", site)) %>%
+#   mutate_if(is.numeric, as.character)
+# 
+# hh_data_comp_pt_entry$date <- as.character(hh_data_comp_pt_entry$date)
+# hh_data_comp <- bind_rows(hh_data_comp, hh_data_comp_pt_entry)
+# 
+# print(hh_data_comp)
 
 # # Merge RedCap and Patient Entry Data -----------
 # hh_data_merged <- hh_data_comp %>%
