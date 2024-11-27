@@ -331,7 +331,7 @@ missing_chg_cutOff <- business_days[length(business_days)-3] # Should this be 2 
 # hh_data_comp_raw_pt_entry <- sqlQuery(con_hh, "SELECT * FROM qidm_dev.dbo.PT_AMB_HAND_HYGIENE_COMP") # Master Referrals Data
 
 hh_data_comp_raw <<- read.csv("hand_hygiene_comp.csv")
-hh_data_comp_raw_pt_entry <<- read.csv("pt_hand_hygiene_comp.csv")
+
 
 # Run on Server ---------------------------
 # con_hh <- dbConnect(odbc(),
@@ -348,6 +348,7 @@ hh_data_comp_raw <<- hh_data_comp_raw %>% distinct()
 
 
 # hh_data_comp_raw_pt_entry_old <- dbGetQuery(con_hh, "SELECT * FROM qidm_prod.dbo.PT_AMB_HAND_HYGIENE_COMP")
+hh_data_comp_raw_pt_entry <<- read.csv("pt_hand_hygiene_comp.csv")
 hh_data_comp_raw_pt_entry <<- as.data.frame(hh_data_comp_raw_pt_entry)
 hh_data_comp_raw_pt_entry <<- hh_data_comp_raw_pt_entry %>% distinct()
 
@@ -462,17 +463,21 @@ hh_data_comp <- hh_data_comp_raw %>%
 
 
 
-# # Process Patient Entry Data --------------------
-# colnames(hh_data_comp_raw_pt_entry) <- tolower(colnames(hh_data_comp_raw_pt_entry))
-# hh_data_comp_pt_entry <- hh_data_comp_raw_pt_entry %>%
-#   rename(date = data_date) %>%
-#   mutate(site = ifelse(site == "MSH", "MSDFP", site)) %>%
-#   mutate_if(is.numeric, as.character)
-# 
-# hh_data_comp_pt_entry$date <- as.character(hh_data_comp_pt_entry$date)
-# hh_data_comp <- bind_rows(hh_data_comp, hh_data_comp_pt_entry)
-# 
-# print(hh_data_comp)
+# Process Patient Entry Data --------------------
+hh_data_comp_raw_pt_entry <<- read.csv("pt_hand_hygiene_comp.csv")
+hh_data_comp_raw_pt_entry <<- as.data.frame(hh_data_comp_raw_pt_entry)
+hh_data_comp_raw_pt_entry <<- hh_data_comp_raw_pt_entry %>% distinct()
+
+colnames(hh_data_comp_raw_pt_entry) <- tolower(colnames(hh_data_comp_raw_pt_entry))
+hh_data_comp_pt_entry <- hh_data_comp_raw_pt_entry %>%
+  rename(date = data_date) %>%
+  mutate(site = ifelse(site == "MSH", "MSDFP", site)) %>%
+  mutate_if(is.numeric, as.character)
+
+hh_data_comp_pt_entry$date <- as.character(hh_data_comp_pt_entry$date)
+hh_data_comp <- bind_rows(hh_data_comp, hh_data_comp_pt_entry)
+
+print(hh_data_comp)
 
 # Merge RedCap and Patient Entry Data -----------
 hh_data_merged <- hh_data_comp %>%
