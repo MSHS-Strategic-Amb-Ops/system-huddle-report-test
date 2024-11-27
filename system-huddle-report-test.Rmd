@@ -460,7 +460,7 @@ hh_data_comp <- hh_data_comp_raw %>%
   mutate_if(is.numeric, as.character) %>%
   filter(!is.na(site))
 
-print(hh_data_comp)
+
 
 # # Process Patient Entry Data --------------------
 # colnames(hh_data_comp_raw_pt_entry) <- tolower(colnames(hh_data_comp_raw_pt_entry))
@@ -474,64 +474,66 @@ print(hh_data_comp)
 # 
 # print(hh_data_comp)
 
-# # Merge RedCap and Patient Entry Data -----------
-# hh_data_merged <- hh_data_comp %>%
-#   filter(!site %in% c("MS NOW", "MSHP", "NYEE", "MSQ","OTHER","MSB")) %>%
-#   filter(!is.na(site)) %>%
-#   dplyr::select(site, unit, date, worker___1, worker___2, worker___3, provider_hands_bef, provider_hands_aft, nurse_hands_bef, nurse_hands_aft, mt_hands_bef, mt_hands_aft) %>%
-#   mutate(across(4:12, as.numeric)) %>%
-#   mutate_if(is.numeric, ~ifelse(is.na(.),0,.)) %>%
-#   mutate_if(is.numeric, ~ifelse(.==2,0,.)) %>%
-#   group_by(site, unit, date) %>%
-#   summarise(worker___1 = sum(worker___1),
-#             worker___2 = sum(worker___2),
-#             worker___3 = sum(worker___3),
-#             provider_hands_bef = sum(provider_hands_bef),
-#             provider_hands_aft = sum(provider_hands_aft),
-#             nurse_hands_bef = sum(nurse_hands_bef),
-#             nurse_hands_aft = sum(nurse_hands_aft),
-#             mt_hands_bef = sum(mt_hands_bef),
-#             mt_hands_aft = sum(mt_hands_aft)) %>%
-#   mutate(date = as.Date(date, "%m/%d/%Y"),
-#          Appt.Year = as.numeric(format(as.Date(date, "%m/%d/%Y"),"%Y")),
-#          Appt.WeekNum = lubridate::epiweek(as.Date(date, "%m/%d/%Y"))) %>%
-#   filter(Appt.Year >= as.numeric(prior_year))
-# 
-# hh_data_merged_role <- hh_data_comp %>%
-#   dplyr::select(site, unit, date, provider_hands_bef, provider_hands_aft, nurse_hands_bef, nurse_hands_aft, mt_hands_bef, mt_hands_aft) %>%
-#   pivot_longer(provider_hands_bef: mt_hands_aft,
-#                names_to = "role",
-#                values_to = "compliance") %>%
-#   mutate(date = as.Date(date, "%m/%d/%Y"),
-#          Appt.Year = as.numeric(format(as.Date(date, "%m/%d/%Y"),"%Y")),
-#          Appt.WeekNum = lubridate::epiweek(as.Date(date, "%m/%d/%Y")),
-#          compliance = ifelse(compliance == 2,0,compliance)) %>%
-#   filter(compliance != "") %>%
-#   filter(compliance != 2) %>%
-#   filter(Appt.Year >= as.numeric(prior_year)) %>%
-#   group_by(site, unit, date, Appt.Year, Appt.WeekNum, role, compliance) %>%
-#   summarise(total_obs = n())%>%
-#   mutate(compliance = ifelse(compliance == 0, "No", "Yes"),
-#          total_obs = as.numeric(total_obs)) %>%
-#   pivot_wider(
-#     names_from = compliance,
-#     values_from = total_obs,
-#     values_fill=list(total_obs=0)) %>%
-#   ungroup() %>%
-#   mutate(total_obs = `Yes`+`No`)
-# 
-# 
-# # Manually Format NET to NETWORK ------------------------
-# hh_data_merged <- hh_data_merged %>%
-#   mutate(site = ifelse(site == "NET","NETWORK",site)) %>%
-#   arrange(date) %>%
-#   filter(unit != "NULL")
-# hh_data_merged_role <- hh_data_merged_role %>%
-#   mutate(site = ifelse(site == "NET","NETWORK",site)) %>%
-#   arrange(date) %>%
-#   filter(unit != "NULL")
-# hh_data_merged <- hh_data_merged %>%
-#   mutate(site = ifelse(unit == "UCC", "MSUS",site))
+# Merge RedCap and Patient Entry Data -----------
+hh_data_merged <- hh_data_comp %>%
+  filter(!site %in% c("MS NOW", "MSHP", "NYEE", "MSQ","OTHER","MSB")) %>%
+  filter(!is.na(site)) %>%
+  dplyr::select(site, unit, date, worker___1, worker___2, worker___3, provider_hands_bef, provider_hands_aft, nurse_hands_bef, nurse_hands_aft, mt_hands_bef, mt_hands_aft) %>%
+  mutate(across(4:12, as.numeric)) %>%
+  mutate_if(is.numeric, ~ifelse(is.na(.),0,.)) %>%
+  mutate_if(is.numeric, ~ifelse(.==2,0,.)) %>%
+  group_by(site, unit, date) %>%
+  summarise(worker___1 = sum(worker___1),
+            worker___2 = sum(worker___2),
+            worker___3 = sum(worker___3),
+            provider_hands_bef = sum(provider_hands_bef),
+            provider_hands_aft = sum(provider_hands_aft),
+            nurse_hands_bef = sum(nurse_hands_bef),
+            nurse_hands_aft = sum(nurse_hands_aft),
+            mt_hands_bef = sum(mt_hands_bef),
+            mt_hands_aft = sum(mt_hands_aft)) %>%
+  mutate(date = as.Date(date, "%m/%d/%Y"),
+         Appt.Year = as.numeric(format(as.Date(date, "%m/%d/%Y"),"%Y")),
+         Appt.WeekNum = lubridate::epiweek(as.Date(date, "%m/%d/%Y"))) %>%
+  filter(Appt.Year >= as.numeric(prior_year))
+
+hh_data_merged_role <- hh_data_comp %>%
+  dplyr::select(site, unit, date, provider_hands_bef, provider_hands_aft, nurse_hands_bef, nurse_hands_aft, mt_hands_bef, mt_hands_aft) %>%
+  pivot_longer(provider_hands_bef: mt_hands_aft,
+               names_to = "role",
+               values_to = "compliance") %>%
+  mutate(date = as.Date(date, "%m/%d/%Y"),
+         Appt.Year = as.numeric(format(as.Date(date, "%m/%d/%Y"),"%Y")),
+         Appt.WeekNum = lubridate::epiweek(as.Date(date, "%m/%d/%Y")),
+         compliance = ifelse(compliance == 2,0,compliance)) %>%
+  filter(compliance != "") %>%
+  filter(compliance != 2) %>%
+  filter(Appt.Year >= as.numeric(prior_year)) %>%
+  group_by(site, unit, date, Appt.Year, Appt.WeekNum, role, compliance) %>%
+  summarise(total_obs = n())%>%
+  mutate(compliance = ifelse(compliance == 0, "No", "Yes"),
+         total_obs = as.numeric(total_obs)) %>%
+  pivot_wider(
+    names_from = compliance,
+    values_from = total_obs,
+    values_fill=list(total_obs=0)) %>%
+  ungroup() %>%
+  mutate(total_obs = `Yes`+`No`)
+
+
+# Manually Format NET to NETWORK ------------------------
+hh_data_merged <- hh_data_merged %>%
+  mutate(site = ifelse(site == "NET","NETWORK",site)) %>%
+  arrange(date) %>%
+  filter(unit != "NULL")
+hh_data_merged_role <- hh_data_merged_role %>%
+  mutate(site = ifelse(site == "NET","NETWORK",site)) %>%
+  arrange(date) %>%
+  filter(unit != "NULL")
+hh_data_merged <- hh_data_merged %>%
+  mutate(site = ifelse(unit == "UCC", "MSUS",site))
+
+print(hh_data_merged)
 
 ```
 
