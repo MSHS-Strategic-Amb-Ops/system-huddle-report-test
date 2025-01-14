@@ -1062,6 +1062,18 @@ vol_trending <- scheduling_data %>%
 
 # Merge with radiology and rad onc monthly volume
 vol_trending <- bind_rows(vol_trending, rad_radOnc_data)
+
+vol_trending_3 <- vol_trending %>%
+  group_by(Campus, Appt.Year) %>%
+  summarise(total = sum(total)) %>%
+  pivot_wider(names_from = Appt.Year,
+              values_from = total) %>%
+  # mutate(target_5_perc = round(`2022`*1.05)) %>%
+  # arrange(factor(Appt.Month, levels = monthOptions)) %>%
+  arrange(Campus) %>%
+  mutate(perc_change = round(((`2024` - `2023`)/`2023`)*100, 0))
+
+
 vol_trending <- vol_trending %>%
   group_by(Campus, Appt.Year, Appt.Month) %>%
   summarise(total = sum(total)) %>%
@@ -1120,6 +1132,7 @@ highchart() %>%
   }) %>%
   hw_grid(ncol = 2, rowheight = 400) %>% htmltools::browsable()
 
+invisible(gc())
 ```
 
 --------------------------------------------------------------------------------
@@ -1271,6 +1284,8 @@ highchart() %>%
   hc_tooltip(shared = TRUE, borderColor = "black")
 }) %>%
   hw_grid(ncol = 2, rowheight = 400) %>% htmltools::browsable()
+
+invisible(gc())
 ```
 
 --------------------------------------------------------------------------------
