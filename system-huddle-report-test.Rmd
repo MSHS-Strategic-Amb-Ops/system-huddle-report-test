@@ -1132,6 +1132,7 @@ highchart() %>%
   }) %>%
   hw_grid(ncol = 2, rowheight = 400) %>% htmltools::browsable()
 
+rm(vol_trending)
 invisible(gc())
 ```
 
@@ -1285,6 +1286,8 @@ highchart() %>%
 }) %>%
   hw_grid(ncol = 2, rowheight = 400) %>% htmltools::browsable()
 
+
+rm(new_vol)
 invisible(gc())
 ```
 
@@ -1343,6 +1346,8 @@ highchart() %>%
 }) %>%
   hw_grid(ncol = 2, rowheight = 450) %>% htmltools::browsable()
 
+
+rm(new_vol_trending_downtown)
 invisible(gc())
 ```
 
@@ -1496,6 +1501,10 @@ map(unique(hh_downtown$site), function(x){
   hc_tooltip(shared = TRUE, borderColor = "black")
 }) %>%
   hw_grid(ncol = 2, rowheight = 400) %>% htmltools::browsable()
+
+
+
+rm(hh_data_merged)
 invisible(gc())
 ```
 
