@@ -286,7 +286,6 @@ hh_crosswalk_tbl <- tbl(conn1, "HH_CROSSWALK")
 
 radiology_dep_mapping_tbl <- tbl(conn1, "RADIOLOGY_DEP_MAPPING")
 
-
 ```
 
 
@@ -711,6 +710,9 @@ missing_chg_data_trend_downtown_5days <- missing_chg_data %>%
   filter(enc.status == "CLOSED")
 
 
+# saveRDS(missing_chg_data_trend_5days, "missing_chg_data_trend_5days.rds")
+# saveRDS(missing_chg_data_trend_downtown_5days, "missing_chg_data_trend_downtown_5days.rds")
+
 # missing_chg_data_trend_5days <- as.data.frame(readRDS("/nfs/data/Applications/Ambulatory/Data_Updated/missing_chg_data_trend_5days.rds"))
 # missing_chg_data_trend_downtown_5days <- as.data.frame(readRDS("/nfs/data/Applications/Ambulatory/Data_Updated/missing_chg_data_trend_downtown_5days.rds"))
 
@@ -1085,6 +1087,9 @@ vol_trending <- vol_trending %>%
   mutate(perc_change = round(((`2024` - `2023`)/`2023`)*100, 0))
 
 
+# saveRDS(vol_trending, "vol_trending.rds")
+
+
 # Output Graphs ------------------------
 map(unique(vol_trending$Campus), function(x){
 highchart() %>%
@@ -1168,6 +1173,9 @@ vol_trending_downtown <- vol_trending_downtown %>%
   mutate(perc_change = round(((`2024` - `2023`)/`2023`)*100, 0))
 
 
+# saveRDS(vol_trending_downtown, "vol_trending_downtown.rds")
+
+
 # Output Graphs ------------------------
 map(unique(vol_trending_downtown$Campus), function(x){
 highchart() %>%
@@ -1249,6 +1257,9 @@ new_vol_trending <- new_vol %>%
   mutate(Appt.Year = as.character(Appt.Year)) %>%
   mutate(Appt.MonthYear = paste0(Appt.Month,"-",Appt.Year))
 
+
+# saveRDS(new_vol, "new_vol.rds")
+
 # new_vol_trending <- as.data.frame(readRDS("/nfs/data/Applications/Ambulatory/Data_Updated/new_vol_trending.rds"))
 
 
@@ -1307,6 +1318,9 @@ new_vol_trending_downtown <- new_vol %>%
   mutate(Appt.Month = format(as.Date(paste0(Appt.MonNum, "-01-", Appt.Year), "%m-%d-%Y"), "%b")) %>%
   mutate(Appt.Year = as.character(Appt.Year)) %>%
   mutate(Appt.MonthYear = paste0(Appt.Month,"-",Appt.Year))
+
+
+# saveRDS(new_vol_trending_downtown, "new_vol_trending_downtown.rds")
 
 # new_vol_trending_downtown <- as.data.frame(readRDS("/nfs/data/Applications/Ambulatory/Data_Updated/new_vol_trending_downtown.rds"))
 
@@ -1523,6 +1537,7 @@ missing_ytd_data <-missing_ytd_data %>%
   mutate(clo.5days = ifelse(open.days <= 5, 'YES', 'NO')) %>%
   collect()
 
+invisible(gc())
 
 missing_ytd_data <- missing_ytd_data %>%
   filter(DEPARTMENT_NAME %!in% exc_depts) %>%
@@ -1535,7 +1550,9 @@ missing_ytd_data <- missing_ytd_data %>%
   mutate(Appt.MonthYear = paste0(Appt.Month,"-",Appt.Year))
 
 
+# saveRDS(missing_ytd_data, "missing_ytd_data.rds")
 # missing_ytd_data <- as.data.frame(readRDS("/nfs/data/Applications/Ambulatory/Data_Updated/missing_ytd_data.rds"))
+invisible(gc())
 
 # Closed Encounters YTD
 closed_ytd_mshs <- missing_ytd_data %>%
@@ -1570,6 +1587,9 @@ open_5days_mshs <- missing_ytd_data %>%
   summarise(open.5days = n())
 # rm(missing_ytd_data)
 
+invisible(gc())
+
+
 missing_chg_ytd_mshs <- Reduce(function(x, y) merge(x, y, all=TRUE), list(closed_ytd_mshs, closed_3days_mshs, closed_5days_mshs, open_ytd_mshs, open_3days_mshs, open_5days_mshs))
 missing_chg_ytd_mshs <- missing_chg_ytd_mshs %>%
   mutate(total.count = clo.count + open.count,
@@ -1586,6 +1606,9 @@ names(header_above) <- paste0("MSHS ",todays_year," YTD Open Encounters")
 header_above_2 <- c("title" = length(missing_chg_ytd_mshs))
 names(header_above_2) <- paste0("Opened Encounters from ",
                               min(missing_ytd_data$Appt.DateYear)," to ",missing_chg_cutOff)
+
+invisible(gc())
+
 missing_chg_ytd_mshs %>%
   # select(everything()) %>%
     # mutate(open.perc = color_tile("lightpink","red")(open.perc),
