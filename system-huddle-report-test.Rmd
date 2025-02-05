@@ -1062,7 +1062,8 @@ vol_trending <- scheduling_data %>%
 
 # Merge with radiology and rad onc monthly volume
 vol_trending <- bind_rows(vol_trending, rad_radOnc_data)
-vol_trending <- vol_trending %>%
+
+vol_trending_site <- vol_trending %>%
   group_by(Campus, Appt.Year, Appt.Month) %>%
   summarise(total = sum(total)) %>%
   pivot_wider(names_from = Appt.Year,
@@ -1072,6 +1073,18 @@ vol_trending <- vol_trending %>%
   arrange(Campus) %>%
   mutate(perc_change = round(((`2025` - `2024`)/`2024`)*100, 0))
 
+vol_trending_mshs <- vol_trending %>%
+  mutate(Campus = "MSHS") %>%
+  group_by(Campus, Appt.Year, Appt.Month) %>%
+  summarise(total = sum(total)) %>%
+  pivot_wider(names_from = Appt.Year,
+              values_from = total) %>%
+  # mutate(target_5_perc = round(`2022`*1.05)) %>%
+  arrange(factor(Appt.Month, levels = monthOptions)) %>%
+  arrange(Campus) %>%
+  mutate(perc_change = round(((`2025` - `2024`)/`2024`)*100, 0))
+
+vol_trending <- bind_rows( vol_trending_mshs, vol_trending_site)
 
 # Output Graphs ------------------------
 map(unique(vol_trending$Campus), function(x){
@@ -1223,7 +1236,7 @@ new_vol <- scheduling_data %>%
   mutate(New.PT3 = ifelse(str_detect(LOS_NAME, "NEW|INITIAL"), "New", "Established"))
 
 
-new_vol_trending <- new_vol %>%
+new_vol_trending_site <- new_vol %>%
   group_by(Campus, Appt.Year, Appt.MonNum, New.PT3) %>%
   summarise(total = sum(total)) %>%
   pivot_wider(names_from = New.PT3,
@@ -1235,6 +1248,20 @@ new_vol_trending <- new_vol %>%
   mutate(Appt.Year = as.character(Appt.Year)) %>%
   mutate(Appt.MonthYear = paste0(Appt.Month,"-",Appt.Year))
 
+new_vol_trending_mshs <- new_vol %>%
+  mutate(Campus = "MSHS") %>%
+  group_by(Campus, Appt.Year, Appt.MonNum, New.PT3) %>%
+  summarise(total = sum(total)) %>%
+  pivot_wider(names_from = New.PT3,
+              values_from = total,
+              values_fill = 0) %>%
+  mutate(total_vol = `New` + `Established`,
+         new_perc = round((New/(total_vol))*100,0)) %>%
+  mutate(Appt.Month = format(as.Date(paste0(Appt.MonNum, "-01-", Appt.Year), "%m-%d-%Y"), "%b")) %>%
+  mutate(Appt.Year = as.character(Appt.Year)) %>%
+  mutate(Appt.MonthYear = paste0(Appt.Month,"-",Appt.Year))
+
+new_vol_trending <- bind_rows(new_vol_trending_mshs, new_vol_trending_site)
 # new_vol_trending <- as.data.frame(readRDS("/nfs/data/Applications/Ambulatory/Data_Updated/new_vol_trending.rds"))
 
 
@@ -1350,7 +1377,26 @@ hh_site <- hh_site %>%
             nurse_hands_bef = sum(nurse_hands_bef),
             nurse_hands_aft = sum(nurse_hands_aft),
             mt_hands_bef = sum(mt_hands_bef),
-            mt_hands_aft = sum(mt_hands_aft))
+            mt_hands_aft = sum(mt_hands_aft)) %>%
+  arrange(site, Month)
+
+
+hh_mshs <- hh_site %>%
+  filter(!is.na(unit)) %>%
+  mutate(site = "MSHS") %>%
+  group_by(site, Month) %>%
+  summarise(worker___1 = sum(worker___1),
+            worker___2 = sum(worker___2),
+            worker___3 = sum(worker___3),
+            provider_hands_bef = sum(provider_hands_bef),
+            provider_hands_aft = sum(provider_hands_aft),
+            nurse_hands_bef = sum(nurse_hands_bef),
+            nurse_hands_aft = sum(nurse_hands_aft),
+            mt_hands_bef = sum(mt_hands_bef),
+            mt_hands_aft = sum(mt_hands_aft)) %>%
+  arrange(site, Month)
+
+hh_site <- bind_rows(hh_mshs, hh_site)
 
 hh_site <- hh_site %>%
   group_by(site, Month) %>%
@@ -1377,8 +1423,7 @@ hh_site <- hh_site %>%
 
 # hh_site <- bind_rows(hh_site, network, msw, msdfp)
 
-hh_site <- hh_site %>%
-  arrange(site, Month)
+  
 
 map(unique(hh_site$site), function(x){
 
